@@ -20,7 +20,7 @@ DisplayText::DisplayText(QWidget *parent) :
     setWordWrapMode (QTextOption::NoWrap);
     setStyleSheet ("");
     // max lines to limit heap usage
-    document ()->setMaximumBlockCount (10000);
+    document ()->setMaximumBlockCount (50000);
 }
 
 void DisplayText::setConfiguration(Configuration const * config)

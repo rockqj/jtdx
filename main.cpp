@@ -247,7 +247,8 @@ int main(int argc, char *argv[])
 
 #if WSJT_QDEBUG_TO_FILE
       // // open a trace file
-      TraceFile trace_file {QDir {QStandardPaths::writableLocation (QStandardPaths::TempLocation)}.absoluteFilePath (a.applicationName () + "_trace.log")};
+      // TraceFile trace_file {QDir {QStandardPaths::writableLocation (QStandardPaths::TempLocation)}.absoluteFilePath (a.applicationName () + "_trace.log")};
+      TraceFile trace_file {QDir {QStandardPaths::writableLocation (QStandardPaths::DataLocation)}.absoluteFilePath ("qt_trace.log")};
 
       // announce to trace file
       qDebug () << program_title (revision ()) + " - Program startup";

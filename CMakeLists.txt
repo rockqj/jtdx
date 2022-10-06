@@ -1,5 +1,19 @@
 cmake_minimum_required (VERSION 3.7.2 FATAL_ERROR)
 
+set (WSJT_QDEBUG_TO_FILE ON)
+set (JTDX_DEBUG_TO_FILE ON)
+set (WSJT_QDEBUG_IN_RELEASE ON)
+
+set (WSJT_TRACE_CAT OFF)
+set (WSJT_TRACE_CAT_POLLS OFF)
+set (WSJT_HAMLIB_TRACE OFF)
+#set (WSJT_TRACE_UDP OFF)
+
+set (WSJT_SKIP_MANPAGES ON)
+set (WSJT_BUILD_UTILS OFF)
+
+set (JTDX_CUSTOMIZE_CALLSIGN rockqj)
+
 if (APPLE)
   #
   # The following variables define the portability and compatability attributes of the Mac macOS build

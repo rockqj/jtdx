@@ -2402,6 +2402,51 @@ ZD8,ZD9,ZF,ZK3,ZL,ZL7,ZL8,ZL9,ZP,ZS,ZS8&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
              </spacer>
             </item>
             <item>
+             <widget class="QPushButton" name="botButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>1</horstretch>
+                <verstretch>1</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>68</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>75</width>
+                <height>7</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Start bot</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">QPushButton:checked {
+	background-color: #00ff00;
+    border-style: outset;
+	border-width: 1px;
+	border-radius: 5px;
+    border-color: black;
+	min-width: 5em;
+	padding: 3px;
+}</string>
+              </property>
+              <property name="text">
+               <string>*Bot*</string>
+              </property>
+              <property name="checkable">
+               <bool>true</bool>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="tuneButton">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -2920,6 +2965,34 @@ ZD8,ZD9,ZF,ZK3,ZL,ZL7,ZL8,ZL9,ZP,ZS,ZS8&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</str
               </property>
               <property name="checkable">
                <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QPushButton" name="BlacklistButton">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+                <horstretch>2</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>65</width>
+                <height>0</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>100</width>
+                <height>60</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add to blacklist and clear dx.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>*Blacklist*</string>
               </property>
              </widget>
             </item>

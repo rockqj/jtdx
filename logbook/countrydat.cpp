@@ -379,6 +379,38 @@ void CountryDat::init(const QString filename,const QString filename2)
     _name.insert("Paraguay",tr("Paraguay"));
     _name.insert("South Africa",tr("S. Africa"));
     _name.insert("Pr. Edward & Marion Is.",tr("Pr. Edward & Marion Is."));
+
+    _name.insert("Xin Jiang",tr("Xin Jiang, China"));
+    _name.insert("Xi Zang (Tibet)",tr("Xi Zang (Tibet), China"));
+    _name.insert("Bei Jing",tr("Bei Jing, China"));
+    _name.insert("Hei Long Jiang",tr("Hei Long Jiang, China"));
+    _name.insert("Ji Lin",tr("Ji Lin, China"));
+    _name.insert("Liao Ning",tr("Liao Ning, China"));
+    _name.insert("Tian Jin",tr("Tian Jin, China"));
+    _name.insert("Nei Mongol",tr("Nei Mongol, China"));
+    _name.insert("He Bei",tr("He Bei, China"));
+    _name.insert("Shan Xi",tr("Shan Xi, China"));
+    _name.insert("Shang Hai",tr("Shang Hai, China"));
+    _name.insert("Shan Dong",tr("Shan Dong, China"));
+    _name.insert("Jiang Su",tr("Jiang Su, China"));
+    _name.insert("Zhe Jiang",tr("Zhe Jiang, China"));
+    _name.insert("Jiang Xi",tr("Jiang Xi, China"));
+    _name.insert("Fu Jian",tr("Fu Jian, China"));
+    _name.insert("An Hui",tr("An Hui, China"));
+    _name.insert("He Nan",tr("He Nan, China"));
+    _name.insert("Hu Bei",tr("Hu Bei, China"));
+    _name.insert("Hu Han",tr("Hu Nan, China"));
+    _name.insert("Guang Dong",tr("Guang Dong, China"));
+    _name.insert("Guang Xi",tr("Guang Xi, China"));
+    _name.insert("Hai Nan",tr("Hai Nan, China"));
+    _name.insert("Si Chuan",tr("Si Chuan, China"));
+    _name.insert("Chong Qing",tr("Chong Qing, China"));
+    _name.insert("Gui Zhou",tr("Gui Zhou, China"));
+    _name.insert("Yun Nan",tr("Yun Nan, China"));
+    _name.insert("Shaan Xi",tr("Shaan Xi, China"));
+    _name.insert("Gan Su",tr("Gan Su, China"));
+    _name.insert("Ning Xia",tr("Ning Xia, China"));
+    _name.insert("Qing Hai",tr("Qing Hai, China"));
 }
 
 QString CountryDat::_extractName(const QString line)

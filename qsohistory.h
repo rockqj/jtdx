@@ -14,6 +14,7 @@
 #include <QRegularExpression>
 #include <QtMath>
 #include "JTDXDateTime.h"
+#include "Configuration.hpp"
 class QsoHistory
 {
  public:
@@ -26,6 +27,7 @@ class QsoHistory
 	void owndata (QString const& mycontinent, QString const& myprefix, QString const& mygrid, bool strictdirCQ);
 	Status status(QString const& callsign, QString &grid);
 	Status autoseq(QString &callsign, QString &grid, QString &rep, int &rx, int &tx, unsigned &time, int &count, int &prio, QString &mode);
+	Status autosniffer(QString &callsign, QString &grid, QString &rep, int &rx, int &tx, unsigned &time, unsigned &seen_time, int &count, int &prio, QString &mode, Configuration &settings, QStringList wantedCallList);
 	Status log_data(QString const& callsign, unsigned &time, QString &rrep, QString &srep);
 	int remove(QString const& callsign);		
 	int blacklist(QString const& callsign);
@@ -44,8 +46,8 @@ class QsoHistory
  	{
 	  QString	call,grid,r_rep,s_rep,tyyp,continent,mpx,mode;
 	  Status	status,srx_c,srx_p,stx_c,stx_p;
-	  unsigned	b_time,time;
-	  int		distance,rx,tx,count,priority;
+	  unsigned	b_time,time,seen_time,active_timestamp,call_timestamp;
+	  int		distance,rx,tx,count,priority,call_count;
 	   	
  	};
 

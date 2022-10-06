@@ -696,6 +696,161 @@ Format:
         <translation>中国</translation>
     </message>
     <message>
+        <location filename="../logbook/countrydat.cpp" line="381"/>
+        <source>Xin Jiang, China</source>
+        <translation>中国新疆</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="382"/>
+        <source>Xi Zang (Tibet), China</source>
+        <translation>中国西藏</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="383"/>
+        <source>Bei Jing, China</source>
+        <translation>中国北京</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="384"/>
+        <source>Hei Long Jiang, China</source>
+        <translation>中国黑龙江</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="385"/>
+        <source>Ji Lin, China</source>
+        <translation>中国吉林</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="386"/>
+        <source>Liao Ning, China</source>
+        <translation>中国辽宁</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="387"/>
+        <source>Tian Jin, China</source>
+        <translation>中国天津</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="388"/>
+        <source>Nei Mongol, China</source>
+        <translation>中国内蒙古</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="389"/>
+        <source>He Bei, China</source>
+        <translation>中国河北</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="390"/>
+        <source>Shan Xi, China</source>
+        <translation>中国山西</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="391"/>
+        <source>Shang Hai, China</source>
+        <translation>中国上海</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="392"/>
+        <source>Shan Dong, China</source>
+        <translation>中国山东</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="393"/>
+        <source>Jiang Su, China</source>
+        <translation>中国江苏</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="394"/>
+        <source>Zhe Jiang, China</source>
+        <translation>中国浙江</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="395"/>
+        <source>Jiang Xi, China</source>
+        <translation>中国江西</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="396"/>
+        <source>Fu Jian, China</source>
+        <translation>中国福建</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="397"/>
+        <source>An Hui, China</source>
+        <translation>中国安徽</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="398"/>
+        <source>He Nan, China</source>
+        <translation>中国河南</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="399"/>
+        <source>Hu Bei, China</source>
+        <translation>中国湖北</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="400"/>
+        <source>Hu Nan, China</source>
+        <translation>中国湖南</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="401"/>
+        <source>Guang Dong, China</source>
+        <translation>中国广东</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="402"/>
+        <source>Guang Xi, China</source>
+        <translation>中国广西</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="403"/>
+        <source>Hai Nan, China</source>
+        <translation>中国海南</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="404"/>
+        <source>Si Chuan, China</source>
+        <translation>中国四川</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="405"/>
+        <source>Chong Qing, China</source>
+        <translation>中国重庆</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="406"/>
+        <source>Gui Zhou, China</source>
+        <translation>中国贵州</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="407"/>
+        <source>Yun Nan, China</source>
+        <translation>中国云南</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="408"/>
+        <source>Shaan Xi, China</source>
+        <translation>中国陕西</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="409"/>
+        <source>Gan Su, China</source>
+        <translation>中国甘肃</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="410"/>
+        <source>Ning Xia, China</source>
+        <translation>中国宁夏</translation>
+    </message>
+    <message>
+        <location filename="../logbook/countrydat.cpp" line="411"/>
+        <source>Qing Hai, China</source>
+        <translation>中国青海</translation>
+    </message>
+    <message>
         <location filename="../logbook/countrydat.cpp" line="108"/>
         <source>Nauru</source>
         <translation>瑙鲁</translation>
@@ -1678,7 +1833,7 @@ Format:
     <message>
         <location filename="../logbook/countrydat.cpp" line="304"/>
         <source>EU Russia</source>
-        <translation>俄罗斯 欧洲</translation>
+        <translation>俄罗斯欧洲</translation>
     </message>
     <message>
         <location filename="../logbook/countrydat.cpp" line="305"/>
@@ -1688,7 +1843,7 @@ Format:
     <message>
         <location filename="../logbook/countrydat.cpp" line="306"/>
         <source>AS Russia</source>
-        <translation>俄罗斯 亚洲</translation>
+        <translation>俄罗斯亚洲</translation>
     </message>
     <message>
         <location filename="../logbook/countrydat.cpp" line="307"/>
@@ -3380,6 +3535,16 @@ ZD8,ZD9,ZF,ZK3,ZL,ZL7,ZL8,ZL9,ZP,ZS,ZS8&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</tra
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;传送一个固定的音调. 可以在一般设置选项中设置 调谐计时器.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
+        <location filename="../mainwindow.ui" line="2359"/>
+        <source>Start bot</source>
+        <translation>启用机器人</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="2373"/>
+        <source>*Bot*</source>
+        <translation>*机器人*</translation>
+    </message>
+    <message>
         <location filename="../mainwindow.ui" line="2439"/>
         <location filename="../mainwindow.cpp" line="6895"/>
         <source>&amp;Tune</source>
@@ -3534,6 +3699,11 @@ ZD8,ZD9,ZF,ZK3,ZL,ZL7,ZL8,ZL9,ZP,ZS,ZS8&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</tra
         <location filename="../mainwindow.ui" line="2810"/>
         <source>Clear D&amp;X</source>
         <translation>清除 D&amp;X</translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="3066"/>
+        <source>*Blacklist*</source>
+        <translation>*黑名单*</translation>
     </message>
     <message>
         <location filename="../mainwindow.ui" line="3202"/>

@@ -2056,7 +2056,7 @@ both here.</string>
                         <number>1</number>
                        </property>
                        <property name="maximum">
-                        <number>5</number>
+                        <number>1000</number>
                        </property>
                        <property name="value">
                         <number>2</number>
@@ -2095,7 +2095,7 @@ both here.</string>
                         <number>1</number>
                        </property>
                        <property name="maximum">
-                        <number>5</number>
+                        <number>1000</number>
                        </property>
                        <property name="value">
                         <number>2</number>
@@ -2121,7 +2121,7 @@ both here.</string>
                         <number>1</number>
                        </property>
                        <property name="maximum">
-                        <number>5</number>
+                        <number>1000</number>
                        </property>
                        <property name="value">
                         <number>4</number>
@@ -2157,7 +2157,7 @@ both here.</string>
                         <number>1</number>
                        </property>
                        <property name="maximum">
-                        <number>5</number>
+                        <number>1000</number>
                        </property>
                        <property name="value">
                         <number>3</number>
@@ -2282,20 +2282,217 @@ both here.</string>
            </layout>
           </widget>
          </item>
-         <item>
-          <spacer name="verticalSpacer_11">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>13</width>
-             <height>13</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
         </layout>
+       </item>
+       <item row="1" column="0">
+        <widget class="Line" name="bot_setting_line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QGroupBox" name="bot_setting_group">
+         <property name="title">
+          <string>Bot settings</string>
+         </property>
+         <layout class="QGridLayout" name="bot_setting_gridLayout">
+          <item row="0" column="0">
+           <layout class="QHBoxLayout" name="bot_setting_target_horizontalLayout">
+            <item>
+             <widget class="QRadioButton" name="bot_setting_target_button_dxccgrid">
+              <property name="text">
+               <string>DXCC + GRID</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">bot_setting_target_button_group</string>
+              </attribute>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="bot_setting_target_button_dxcconly">
+              <property name="text">
+               <string>DXCC Only</string>
+              </property>
+              <attribute name="buttonGroup">
+               <string notr="true">bot_setting_target_button_group</string>
+              </attribute>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="1" column="0">
+           <layout class="QHBoxLayout" name="bot_setting_grid_horizontalLayout">
+            <item>
+             <widget class="QLabel" name="bot_setting_grid_label">
+              <property name="text">
+               <string>New GRID</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_grid_trycount_label">
+              <property name="text">
+               <string>Try Count:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="bot_setting_grid_trycount_spin">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
+              </property>
+              <property name="value">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_grid_trycount_unit">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>times</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_grid_ignoretime_label">
+              <property name="text">
+               <string>Ignore Time: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="bot_setting_grid_ignoretime_spin">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>60</number>
+              </property>
+              <property name="value">
+               <number>10</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_grid_ignoretime_unit">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>minutes</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="0">
+           <layout class="QHBoxLayout" name="bot_setting_dxcc_horizontalLayout">
+            <item>
+             <widget class="QLabel" name="bot_setting_dxcc_label">
+              <property name="text">
+               <string>New DXCC</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_dxcc_trycount_label">
+              <property name="text">
+               <string>Try Count:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="bot_setting_dxcc_trycount_spin">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
+              </property>
+              <property name="value">
+               <number>5</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_dxcc_trycount_unit">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>times</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_dxcc_ignoretime_label">
+              <property name="text">
+               <string>Ignore Time: </string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="bot_setting_dxcc_ignoretime_spin">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>60</number>
+              </property>
+              <property name="value">
+               <number>2</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="bot_setting_dxcc_ignoretime_unit">
+              <property name="enabled">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>minutes</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <spacer name="bot_setting_verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>5</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
@@ -7390,5 +7587,6 @@ soundcard changes</string>
   <buttongroup name="CAT_stop_bits_button_group"/>
   <buttongroup name="TX_audio_source_button_group"/>
   <buttongroup name="CAT_data_bits_button_group"/>
+  <buttongroup name="bot_setting_target_button_group"/>
  </buttongroups>
 </ui>

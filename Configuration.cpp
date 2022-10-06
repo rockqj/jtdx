@@ -428,6 +428,8 @@ private:
   void delete_stations ();
   void insert_station ();
 
+  void refresh_audio_device_impl ();
+
   Q_SLOT void on_font_push_button_clicked ();
   Q_SLOT void on_decoded_text_font_push_button_clicked ();
   Q_SLOT void on_PTT_port_combo_box_activated (int);
@@ -877,7 +879,11 @@ private:
   bool default_audio_output_device_selected_;
   AudioDevice::Channel audio_output_channel_;
   
-  
+  qint32 bot_setting_target_;
+  qint32 bot_setting_grid_trycount_;
+  qint32 bot_setting_grid_ignoretime_;
+  qint32 bot_setting_dxcc_trycount_;
+  qint32 bot_setting_dxcc_ignoretime_;
 
   friend class Configuration;
 };
@@ -905,6 +911,7 @@ bool Configuration::is_active () const {return m_->isVisible ();}
 QAudioDeviceInfo const& Configuration::audio_input_device () const {return m_->audio_input_device_;}
 AudioDevice::Channel Configuration::audio_input_channel () const {return m_->audio_input_channel_;}
 QAudioDeviceInfo const& Configuration::audio_output_device () const {return m_->audio_output_device_;}
+void Configuration::refresh_audio_device () {m_->refresh_audio_device_impl();}
 AudioDevice::Channel Configuration::audio_output_channel () const {return m_->audio_output_channel_;}
 bool Configuration::restart_audio_input () const {return m_->restart_sound_input_device_;}
 bool Configuration::restart_audio_output () const {return m_->restart_sound_output_device_;}
@@ -1104,6 +1111,12 @@ QDir Configuration::save_directory () const {return m_->save_directory_;}
 QString Configuration::rig_name () const {return m_->rig_params_.rig_name;}
 bool Configuration::pwrBandTxMemory () const {return m_->pwrBandTxMemory_;}
 bool Configuration::pwrBandTuneMemory () const {return m_->pwrBandTuneMemory_;}
+
+qint32 Configuration::bot_setting_target() const {return m_->bot_setting_target_;}
+qint32 Configuration::bot_setting_grid_trycount() const {return m_->bot_setting_grid_trycount_;}
+qint32 Configuration::bot_setting_grid_ignoretime() const {return m_->bot_setting_grid_ignoretime_;}
+qint32 Configuration::bot_setting_dxcc_trycount() const {return m_->bot_setting_dxcc_trycount_;}
+qint32 Configuration::bot_setting_dxcc_ignoretime() const {return m_->bot_setting_dxcc_ignoretime_;}
 
 TransceiverFactory::Capabilities::PortType Configuration::current_port_type () const
 {
@@ -1568,6 +1581,9 @@ Configuration::impl::impl (Configuration * self, QSettings * settings, QWidget *
   ui_->split_mode_button_group->setId (ui_->split_none_radio_button, TransceiverFactory::split_mode_none);
   ui_->split_mode_button_group->setId (ui_->split_rig_radio_button, TransceiverFactory::split_mode_rig);
   ui_->split_mode_button_group->setId (ui_->split_emulate_radio_button, TransceiverFactory::split_mode_emulate);
+
+  ui_->bot_setting_target_button_group->setId (ui_->bot_setting_target_button_dxccgrid, 0);
+  ui_->bot_setting_target_button_group->setId (ui_->bot_setting_target_button_dxcconly, 1);
 
   //
   // setup hooks to keep audio channels aligned with devices
@@ -2149,6 +2165,12 @@ Radio::convert_dark("#fafbfe",useDarkStyle_),Radio::convert_dark("#dcdef1",useDa
   next_macros_.setStringList (macros_.stringList ());
   next_stations_.station_list (stations_.station_list ());
 
+  ui_->bot_setting_target_button_group->button (bot_setting_target_)->setChecked (true);
+  ui_->bot_setting_grid_trycount_spin->setValue (bot_setting_grid_trycount_);
+  ui_->bot_setting_grid_ignoretime_spin->setValue (bot_setting_grid_ignoretime_);
+  ui_->bot_setting_dxcc_trycount_spin->setValue (bot_setting_dxcc_trycount_);
+  ui_->bot_setting_dxcc_ignoretime_spin->setValue (bot_setting_dxcc_ignoretime_);
+
   set_rig_invariants ();
 }
 
@@ -2243,10 +2265,10 @@ void Configuration::impl::read_settings ()
   aggressive_ = settings_->value ("Aggressive", 1).toInt (); if(!(aggressive_>=1 && aggressive_<=5)) aggressive_=1;
   harmonicsdepth_ = settings_->value ("HarmonicsDecodingDepth", 0).toInt (); if(!(harmonicsdepth_>=0 && harmonicsdepth_<=4)) harmonicsdepth_=0;
   ntopfreq65_ = settings_->value ("TopFrequencyJT65", 2700).toInt (); if(!(ntopfreq65_>=100 && ntopfreq65_<=5000)) ntopfreq65_=2700;
-  nAnswerCQCounter_ = settings_->value ("SeqAnswerCQCounterValue", 2).toInt (); if(!(nAnswerCQCounter_>=1 && nAnswerCQCounter_<=5)) nAnswerCQCounter_=2;
-  nAnswerInCallCounter_ = settings_->value ("SeqAnswerInCallCounterValue", 3).toInt (); if(!(nAnswerInCallCounter_>=1 && nAnswerInCallCounter_<=5)) nAnswerInCallCounter_=2;
-  nSentRReportCounter_ = settings_->value ("SeqSentRReportCounterValue", 5).toInt (); if(!(nSentRReportCounter_>=1 && nSentRReportCounter_<=5)) nSentRReportCounter_=3;
-  nSentRR7373Counter_ = settings_->value ("SeqSentRR7373CounterValue", 4).toInt (); if(!(nSentRR7373Counter_>=1 && nSentRR7373Counter_<=5)) nSentRR7373Counter_=2;
+  nAnswerCQCounter_ = settings_->value ("SeqAnswerCQCounterValue", 2).toInt (); if(!(nAnswerCQCounter_>=1 && nAnswerCQCounter_<=1000)) nAnswerCQCounter_=2;
+  nAnswerInCallCounter_ = settings_->value ("SeqAnswerInCallCounterValue", 3).toInt (); if(!(nAnswerInCallCounter_>=1 && nAnswerInCallCounter_<=1000)) nAnswerInCallCounter_=2;
+  nSentRReportCounter_ = settings_->value ("SeqSentRReportCounterValue", 5).toInt (); if(!(nSentRReportCounter_>=1 && nSentRReportCounter_<=1000)) nSentRReportCounter_=3;
+  nSentRR7373Counter_ = settings_->value ("SeqSentRR7373CounterValue", 4).toInt (); if(!(nSentRR7373Counter_>=1 && nSentRR7373Counter_<=1000)) nSentRR7373Counter_=2;
   nsingdecatt_ = settings_->value ("nSingleDecodeAttempts", 1).toInt (); if(!(nsingdecatt_>=1 && nsingdecatt_<=3)) nsingdecatt_=1;
   fmaskact_ = settings_->value ("FMaskDecoding", false).toBool ();
   answerCQCount_ = settings_->value ("SeqAnswerCQCount", false).toBool ();
@@ -2597,6 +2619,12 @@ void Configuration::impl::read_settings ()
   if(settings_->value ("pwrBandTuneMemory").toString()=="false" || settings_->value ("pwrBandTuneMemory").toString()=="true")
     pwrBandTuneMemory_ = settings_->value("pwrBandTuneMemory").toBool ();
   else pwrBandTuneMemory_ = false;
+
+  bot_setting_target_ = settings_->value ("BotSettingTarget", 0).toInt ();
+  bot_setting_grid_trycount_ = settings_->value ("BotSettingGridTryCount", 3).toInt ();
+  bot_setting_grid_ignoretime_ = settings_->value ("BotSettingGridIgnoreTime", 10).toInt ();
+  bot_setting_dxcc_trycount_ = settings_->value ("BotSettingDxccTryCount", 6).toInt ();
+  bot_setting_dxcc_ignoretime_ = settings_->value ("BotSettingDxccIgnoreTime", 2).toInt ();
 }
 
 void Configuration::add_callsign_hideFilter (QString basecall)
@@ -2855,6 +2883,12 @@ void Configuration::impl::write_settings ()
   settings_->setValue ("pwrBandTxMemory", pwrBandTxMemory_);
   settings_->setValue ("pwrBandTuneMemory", pwrBandTuneMemory_);
   settings_->setValue ("Region", QVariant::fromValue (region_));  
+
+  settings_->setValue ("BotSettingTarget", bot_setting_target_);
+  settings_->setValue ("BotSettingGridTryCount", bot_setting_grid_trycount_);
+  settings_->setValue ("BotSettingGridIgnoreTime", bot_setting_grid_ignoretime_);
+  settings_->setValue ("BotSettingDxccTryCount", bot_setting_dxcc_trycount_);
+  settings_->setValue ("BotSettingDxccIgnoreTime", bot_setting_dxcc_ignoretime_);
 }
 
 void Configuration::impl::set_rig_invariants ()
@@ -3490,6 +3524,12 @@ void Configuration::impl::accept ()
       stations_.station_list(next_stations_.station_list ());
       stations_.sort (StationList::band_column);
     }
+
+  bot_setting_target_ = ui_->bot_setting_target_button_group->checkedId();
+  bot_setting_grid_trycount_ = ui_->bot_setting_grid_trycount_spin->value ();
+  bot_setting_grid_ignoretime_ = ui_->bot_setting_grid_ignoretime_spin->value ();
+  bot_setting_dxcc_trycount_ = ui_->bot_setting_dxcc_trycount_spin->value ();
+  bot_setting_dxcc_ignoretime_ = ui_->bot_setting_dxcc_ignoretime_spin->value ();
  
   write_settings ();		// make visible to all
 }
@@ -4943,6 +4983,60 @@ void Configuration::impl::on_refresh_push_button_clicked ()
   restart_sound_input_device_ = false;
   restart_sound_output_device_ = false;
   restart_tci_device_ = false;
+}
+
+void Configuration::impl::refresh_audio_device_impl ()
+{
+  on_refresh_push_button_clicked();
+
+  SettingsGroup g {settings_, "Configuration"};
+  {
+    QString input_name = settings_->value ("SoundInName").toString ();
+    if (audio_input_device_.deviceName() != input_name)
+    {
+      qDebug() << "Input audio device changed, reset by setting." << audio_input_device_.deviceName() << input_name;;
+      auto index = 0;
+      Q_FOREACH (auto const& p, QAudioDeviceInfo::availableDevices (QAudio::AudioInput)) // available audio input devices
+        {
+          if (p.deviceName () == input_name)
+          {
+            audio_input_device_ = p;
+            default_audio_input_device_selected_ = false;
+            restart_sound_input_device_ = true;
+            ui_->sound_input_combo_box->setCurrentIndex (index+1);
+          }
+          index++;
+        }
+    }
+    // else
+    // {
+    //   qDebug() << "Input audio device unchanged.";
+    // }
+  }
+
+  {
+    QString output_name = settings_->value ("SoundOutName").toString ();
+    if (audio_output_device_.deviceName() != output_name)
+    {
+      qDebug() << "Output audio device changed, reset by setting." << audio_output_device_.deviceName() << output_name;
+      auto index = 0;
+      Q_FOREACH (auto const& p, QAudioDeviceInfo::availableDevices (QAudio::AudioOutput)) // available audio output devices
+        {
+          if (p.deviceName () == output_name)
+          {
+            audio_output_device_ = p;
+            default_audio_output_device_selected_ = false;
+            restart_sound_output_device_ = true;
+            ui_->sound_output_combo_box->setCurrentIndex (index+1);
+          }
+          index++;
+        }
+    }
+    // else
+    // {
+    //   qDebug() << "Output audio device unchanged.";
+    // }
+  }
 }
 
 void Configuration::impl::on_tci_audio_check_box_clicked(bool checked)

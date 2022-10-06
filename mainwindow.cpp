@@ -603,7 +603,7 @@ MainWindow::MainWindow(bool multiple, QSettings * settings, QSharedMemory *shdme
            , &m_WSPR_band_hopping, &WSPRBandHopping::set_tx_percent);
 
   on_EraseButton_clicked ();
-  clearDX ("");
+  clearDX ("init");
 
   QActionGroup* modeGroup = new QActionGroup(this);
   ui->actionFT4->setActionGroup(modeGroup);
@@ -831,6 +831,7 @@ MainWindow::MainWindow(bool multiple, QSettings * settings, QSharedMemory *shdme
   // Hook up working frequencies.
   ui->bandComboBox->setModel (m_config.frequencies ());
   ui->bandComboBox->setModelColumn (FrequencyList_v2::frequency_mhz_column);
+  ui->bandComboBox->setMaxVisibleItems(50);
 
   // combo box drop down width defaults to the line edit + decorator width,
   // here we change that to the column width size hint of the model column
@@ -949,6 +950,7 @@ MainWindow::MainWindow(bool multiple, QSettings * settings, QSharedMemory *shdme
   ui->decodedTextLabel->setText(t);
   ui->decodedTextLabel2->setText(t);
 
+  ui->botButton->setMaximumSize(80,45);
   ui->tuneButton->setMaximumSize(80,45);
   ui->monitorButton->setMaximumSize(80,45);
   ui->bypassButton->setMaximumSize(80,45);
@@ -1698,6 +1700,7 @@ void MainWindow::setAutoSeqButtonStyle(bool checked) {
 // set text on TX even/odd minute button
 void MainWindow::setMinButton()
 {
+  qDebug() << "setMinButton";
   if(!m_mode.startsWith ("WSPR")) {
 	if(m_txFirst) {
 	  if(m_mode.startsWith("FT")) {
@@ -1723,9 +1726,10 @@ void MainWindow::setMinButton()
 
 void MainWindow::autoStopTx(QString reason)
 {
+  qDebug() << "autoStopTx:" << reason;
 //prevent AF RX frequency jumps since QSO is finished and prevent unexpected Halt Tx in autologging mode
 //  if(m_config.clear_DX () || m_config.autolog()) clearDX ();
-  if(m_enableTx || m_transmitting || m_btxok || g_iptt==1) haltTx(reason);
+  if(m_enableTx || m_transmitting || m_btxok || g_iptt==1) if (!reason.endsWith("Autolog ")) haltTx(reason);
 //prevent any possible sequence breaking with this callsign at the next QSO attempt
   if(m_skipTx1 && reason.endsWith ("counter triggered ") && (m_ntx==2 || m_QSOProgress==REPORT)) m_qsoHistory.remove(m_hisCall);
 //prevent AF RX frequency jumps since QSO is finished and prevent unexpected Halt Tx in autologging mode
@@ -2557,6 +2561,7 @@ ui->enableTxButton->setStyleSheet(QString("QPushButton{color: %1;background: %2;
 //  ui->txrb6->setStyleSheet(QString("QRadioButton::indicator:checked:disabled{background: %1;width: 6px;height: 6px;border-radius: 3px;margin-left: 3px}").arg(Radio::convert_dark("#222222",m_useDarkStyle)));
   if(m_autoseq && !m_autoTx) ui->AutoTxButton->setStyleSheet(QString("QPushButton{color: %1;background: %2;border-style: solid;border-width: 1px;border-color: %3;min-width: 5em;padding: 3px}").arg(Radio::convert_dark("#000000",m_useDarkStyle),Radio::convert_dark("#ffbbbb",m_useDarkStyle),Radio::convert_dark("#808080",m_useDarkStyle)));
   else ui->AutoTxButton->setStyleSheet(QString("QPushButton:checked{background: %1}").arg(Radio::convert_dark("#00ff00",m_useDarkStyle)));
+  ui->botButton->setStyleSheet(QString("QPushButton:checked{background: %1}").arg(Radio::convert_dark("#00ff00",m_useDarkStyle)));
   ui->tuneButton->setStyleSheet(QString("QPushButton:checked{background: %1}").arg(Radio::convert_dark("#ff0000",m_useDarkStyle)));
   ui->monitorButton->setStyleSheet(QString("QPushButton:checked{background: %1}").arg(Radio::convert_dark("#00ff00",m_useDarkStyle)));
   ui->bypassButton->setStyleSheet(QString("QPushButton:checked{background: %1}").arg(Radio::convert_dark("#00ff00",m_useDarkStyle)));
@@ -2737,7 +2742,7 @@ void MainWindow::closeEvent(QCloseEvent * e)
   m_valid = false;              // suppresses subprocess errors
   if(m_config.clear_DX_exit())
     {
-      clearDX ("");
+      clearDX ("close");
     }
   m_config.transceiver_offline ();
   writeSettings ();
@@ -3442,12 +3447,14 @@ void MainWindow::process_Auto()
   int prio = 0;
   bool counters = true;
   bool counters2 = true;
+  bool snifferTx = false;
   m_status = QsoHistory::NONE;
   QString hisCall = m_hisCall;
   QString rpt = m_rpt;
   QString grid = m_hisGrid;
   QString mode = "";
   unsigned time = 0;
+  unsigned seen_time = 0;
   int rx = ui->RxFreqSpinBox->value ();
   int tx = ui->TxFreqSpinBox->value ();
   QStringList StrStatus = {"NONE","RFIN","RCQ","SCQ","RCALL","SCALL","RREPORT","SREPORT","RRREPORT","SRREPORT","RRR","SRR","RRR73","SRR73","R73","S73","FIN"};
@@ -3485,7 +3492,7 @@ void MainWindow::process_Auto()
       grid = m_hisGrid;
       m_status = QsoHistory::NONE;
     } else if ((m_status == QsoHistory::RCQ || m_status == QsoHistory::SCALL || (m_status == QsoHistory::SREPORT && m_skipTx1 && !m_houndMode)) && m_config.answerCQCount() &&
-        ((prio > 4 && prio < 17) || prio < 2 || m_strictdirCQ) && (m_config.nAnswerCQCounter() <= count || m_reply_other)) {
+        ((prio > 4 && prio < 17) || prio < 2 || m_strictdirCQ) && (m_config.nAnswerCQCounter() <= count)) {
       clearDX (" cleared, RCQ/SCALL/SREPORT count reached");
       if (m_reply_other)
           counters2 = false;
@@ -3500,7 +3507,7 @@ void MainWindow::process_Auto()
       if (m_singleshot)
         counters = false;
     } else if ((m_status == QsoHistory::RCALL || (m_status == QsoHistory::SREPORT && !m_skipTx1)) && m_config.answerInCallCount() && 
-        (m_config.nAnswerInCallCounter() <= count || m_reply_other)) {
+        (m_config.nAnswerInCallCounter() <= count)) {
       clearDX (" cleared, RCALL/SREPORT count reached");
       m_qsoHistory.calllist(hisCall,rpt.toInt(),time);
       count = m_qsoHistory.reset_count(hisCall);
@@ -3543,6 +3550,12 @@ void MainWindow::process_Auto()
     else if (m_callHigherNewCall) time |= 256;
     if (m_rprtPriority) time |= 16;
     if (m_maxDistance) time |= 32;
+    if (m_hisCall.isEmpty() && !ui->enableTxButton->isChecked() && ui->botButton->isChecked()) {
+      m_status = m_qsoHistory.autosniffer(hisCall,grid,rpt,rx,tx,time,seen_time,count,prio,mode,m_config,m_wantedCallList);
+      if (!hisCall.isEmpty()) snifferTx = true;
+      qDebug() << "Sniffer end:" << hisCall << "priority:" << prio << "grid:" << grid << "rpt:" << rpt
+        << "status:" << StrStatus[m_status] << "time:" << time << "count:" << count;
+    } else {
     m_status = m_qsoHistory.autoseq(hisCall,grid,rpt,rx,tx,time,count,prio,mode);
     if(m_config.write_decoded_debug()) {
       QString StrDirection = "";
@@ -3559,6 +3572,7 @@ void MainWindow::process_Auto()
         if (m_status > QsoHistory::RREPORT) StrPriority += " Resume interrupted QSO ";
       }
       writeToALLTXT("hisCall:" + hisCall + "mode:" + mode + StrPriority + " time:" + QString::number(time) +  " autoselect: " + StrDirection + " status: " + StrStatus[m_status] + " count: " + QString::number(count)+ " prio: " + QString::number(prio));
+    }
     }
     if (!hisCall.isEmpty ()) {
       if (m_callToClipboard) clipboard->setText(hisCall);
@@ -3679,6 +3693,23 @@ void MainWindow::process_Auto()
     if (!counters) {
        if(m_singleshot) { autoStopTx("m_singleshot, counter triggered "); }
        else if(m_houndMode) { autoStopTx("m_houndMode, counter triggered "); }
+    }
+  }
+
+  // ignore normal call
+  if (snifferTx && ui->botButton->isChecked() && !ui->enableTxButton->isChecked() && !m_hisCall.isEmpty() && prio >= 15) {
+    int nmod = fmod(double(seen_time),2.0*m_TRperiod);
+    qDebug() << "AutoCall:" << m_hisCall << "seen_time:" << seen_time << "nmod:" << nmod << "m_txFirst:" << m_txFirst << "txTimeUI:" << ui->TxMinuteButton->isChecked();
+    if (m_txFirst != (nmod!=0)) {
+      m_txFirst=(nmod!=0);
+      if(m_txFirst && !ui->TxMinuteButton->isChecked()) ui->TxMinuteButton->click();
+      else if(!m_txFirst && ui->TxMinuteButton->isChecked()) ui->TxMinuteButton->click();
+      qDebug() << "Update txFirst:" << m_txFirst;
+    }
+
+    if (ui->AutoTxButton->isChecked()) {
+      ui->enableTxButton->setChecked (true);
+      on_enableTxButton_clicked(true);
     }
   }
 }
@@ -3945,7 +3976,7 @@ void MainWindow::readFromStdout()                             //readFromStdout
       } else if (!deCall.isEmpty() && Radio::base_callsign (deCall) == Radio::base_callsign (m_hisCall) && decodedtextmsg.left(3) != "CQ " && decodedtextmsg.left(3) != "DE " && decodedtextmsg.left(4) != "QRZ " && !decodedtextmsg.contains(" 73") && !decodedtextmsg.contains(" RR73") && !decodedtextmsg.contains(" RRR")) {
         m_used_freq = decodedtext.frequencyOffset();
          if (m_enableTx && !m_reply_me && !m_houndMode && (abs(m_used_freq - ui->TxFreqSpinBox->value ()) < m_nguardfreq || m_config.halttxreplyother ())) { 
-           haltTx("readFromStdout, not owner of the frequency or reply to other ");/* if(m_skipTx1) m_qsoHistory.remove(m_hisCall); */
+          //  haltTx("readFromStdout, not owner of the frequency or reply to other ");/* if(m_skipTx1) m_qsoHistory.remove(m_hisCall); */
          }
       }
 
@@ -4072,7 +4103,14 @@ void MainWindow::on_EraseButton_clicked()                          //Erase
   m_msErase=ms;
 }
 
-void MainWindow::on_ClearDxButton_clicked() { clearDX (" is cleared by ClearDxButton, user action"); } //Erase
+void MainWindow::on_ClearDxButton_clicked() { haltTx("halt by cleardx"); clearDX (" is cleared by ClearDxButton, user action"); } //Erase
+
+void MainWindow::on_BlacklistButton_clicked()                          //Blacklist
+{
+  m_qsoHistory.blacklist(m_hisCall);
+  haltTx("halt by cleardx");
+  clearDX (" is cleared by ClearDxButton, user action");
+}
 
 void MainWindow::decodeBusy(bool b)                             //decodeBusy()
 {
@@ -4676,7 +4714,7 @@ void MainWindow::set_scheduler(QString const& setto,bool mixed)
   m_wideGraph->setRxBand (m_config.bands ()->find (frq));
 }
 
-void MainWindow::haltTx(QString reason) { m_haltTxWritten=true; writeHaltTxEvent(reason); on_stopTxButton_clicked(); }
+void MainWindow::haltTx(QString reason) { qDebug() << "haltTx" << reason; m_haltTxWritten=true; writeHaltTxEvent(reason); on_stopTxButton_clicked(); }
 
 void MainWindow::haltTxTuneTimer()
 {
@@ -4817,6 +4855,7 @@ void MainWindow::ba2msg(QByteArray ba, char message[])             //ba2msg()
 
 void MainWindow::on_TxMinuteButton_clicked(bool checked)        //TxFirst
 {
+  qDebug() << "on_TxMinuteButton_clicked" << checked;
   m_txFirst=checked;
   if(m_transmitting && m_config.write_decoded_debug()) writeToALLTXT("Tx halted: period changed via TX period button");
   if (m_txGenerated != checked && m_enableTx && m_autoseq)  clearDX (" cleared, Tx Minute button clicked");
@@ -5552,6 +5591,7 @@ void MainWindow::TxAgain() { enableTx_mode(true); }
 
 void MainWindow::clearDX (QString reason)
 {
+  qDebug() << "clearDX:" << reason;
   QString dxcallclr=m_hisCall;
   clearDXfields("");
   genStdMsgs(QString {});
@@ -7218,7 +7258,7 @@ void MainWindow::handle_transceiver_failure (QString const& reason)
   ui->readFreq->setStyleSheet(ui->readFreq->styleSheet().left(230)+QString("background: %1;\n color: %2;\n}").arg(Radio::convert_dark("#ff0000",m_useDarkStyle),Radio::convert_dark("#000000",m_useDarkStyle)));
   m_rigOk=false;
   ui->readFreq->setEnabled (true);
-  haltTx("Rig control error: " + reason + " ");
+  // haltTx("Rig control error: " + reason + " ");
   rigFailure (tr("Rig Control Error"), reason);
 }
 
@@ -7925,6 +7965,24 @@ void MainWindow::on_the_minute ()
   else { txwatchdog (false); }
   //3...4 minutes to stop AP decoding
   if(!m_transmitting && m_mode=="FT8" && (m_jtdxtime->currentMSecsSinceEpoch2()-m_mslastTX) > 120000) m_lapmyc=0;
+
+  m_config.refresh_audio_device ();
+  if((m_config.restart_audio_input () || m_tci) && !m_config.audio_input_device ().isNull ()) {
+    Q_EMIT startAudioInputStream (m_config.audio_input_device (), m_rx_audio_buffer_frames, m_detector,
+                                  m_downSampleFactor, m_config.audio_input_channel ());
+  }
+
+  if((m_config.restart_audio_output () || m_tci) && !m_config.audio_output_device ().isNull ()) {
+    Q_EMIT initializeAudioOutputStream (m_config.audio_output_device (),
+        AudioDevice::Mono == m_config.audio_output_channel () ? 1 : 2, m_tx_audio_buffer_frames);
+    if(m_transmitting || g_iptt==1) {
+//           ui->stopTxButton->click (); // halt any transmission
+        haltTx("settings change is accepted ");
+        enableTx_mode (false);       // switch off EnableTx button
+        ui->enableTxButton->setStyleSheet(QString("QPushButton {color: %1;background: %2;border-style: solid;border-width: 1px;border-radius: 5px;border-color: %3;min-width: 63px;padding: 0px}").arg(Radio::convert_dark("#000000",m_useDarkStyle),Radio::convert_dark("#ffff76",m_useDarkStyle),Radio::convert_dark("#000000",m_useDarkStyle)));
+        TxAgainTimer.start(2000);
+      }
+  }
 }
 
 void MainWindow::toggle_skipTx1 ()
@@ -8005,6 +8063,9 @@ void MainWindow::txwatchdog (bool triggered)
       if (m_enableTx) enableTx_mode (false);
       tx_status_label->setStyleSheet (QString("QLabel{background: %1}").arg(Radio::convert_dark("#ff8080",m_useDarkStyle)));
       tx_status_label->setText (tr("Tx watchdog expired"));
+      clearDX ("Tx watchdog expired: " + QString::number(m_idleMinutes));
+      m_idleMinutes = 0;
+      update_watchdog_label ();
     }
   else
     {

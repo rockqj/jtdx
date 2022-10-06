@@ -91,6 +91,7 @@ public:
   bool restart_audio_input () const;
   bool restart_audio_output () const;
   bool restart_tci () const;
+  void refresh_audio_device ();
   QString my_callsign () const;
   QString my_grid () const;
   QString timeFrom () const;
@@ -273,6 +274,12 @@ public:
   QColor color_WorkedCall () const;
   bool pwrBandTxMemory () const;
   bool pwrBandTuneMemory () const;
+
+  qint32 bot_setting_target() const;
+  qint32 bot_setting_grid_trycount() const;
+  qint32 bot_setting_grid_ignoretime() const;
+  qint32 bot_setting_dxcc_trycount() const;
+  qint32 bot_setting_dxcc_ignoretime() const;
 
   // This method queries Port typ.
   TransceiverFactory::Capabilities::PortType current_port_type () const;

@@ -107,7 +107,7 @@ void TraceFile::impl::message_handler (QtMsgType type, QMessageLogContext const&
     Q_ASSERT_X (current_stream_, "TraceFile:message_handler", "no stream to write to");
     *current_stream_
       << QDateTime::currentDateTimeUtc ().toString ("yyyy-MM-ddTHH:mm:ss.zzzZ")
-      << '(' << context.file << ':' << context.line /* << ", " << context.function */ << ')'
+      << '(' << QString(context.file).splitRef("\\").last() << ':' << context.line /* << ", " << context.function */ << ')'
       << severity << ": " << msg.trimmed () <<
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
                  endl;

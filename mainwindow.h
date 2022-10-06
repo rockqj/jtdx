@@ -240,6 +240,7 @@ private slots:
   void decodeBusy(bool b);
   void on_EraseButton_clicked();
   void on_ClearDxButton_clicked();
+  void on_BlacklistButton_clicked();
   void on_txb1_clicked();
   void on_TxMinuteButton_clicked(bool checked);
   void on_rrrCheckBox_stateChanged(int arg1);

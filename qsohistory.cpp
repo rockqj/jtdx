@@ -4,6 +4,9 @@
  */
 
 #include "qsohistory.h"
+#include <time.h>
+#include <QDebug>
+
 void QsoHistory::init()
 {
     _data.clear();
@@ -325,6 +328,165 @@ as_active = false;
 return NONE;
 }
 
+unsigned get_timestamp() {
+  return unsigned(time(NULL));
+}
+
+QsoHistory::Status QsoHistory::autosniffer(QString &callsign, QString &grid, QString &rep, int &rx, int &tx, unsigned &time, unsigned &seen_time, int &count, int &prio, QString &mode, Configuration &settings, QStringList wantedCallList)
+{
+  qDebug() << "Sniffer start:" << _working << "call:" << callsign << "grid:" << grid << "time:" << QString::number(time) << "active:" << as_active;
+  QsoHistory::Status ret = NONE;
+  if (_working)
+  {
+    int on_black = 0;
+
+    algo=time;
+    dist = 0;
+    if (algo & 128) a_init=-1;
+    else a_init=4;
+    if (algo & 64) b_init=-1;
+    else if (algo & 256) b_init=8;
+    else b_init=4;
+
+    int normalCountLimit = settings.bot_setting_grid_trycount(), prioCountLimit = settings.bot_setting_dxcc_trycount();
+    unsigned normalRestTime = settings.bot_setting_grid_ignoretime()*60, prioRestTime = settings.bot_setting_dxcc_ignoretime()*60;
+    unsigned curTime = get_timestamp();
+
+    // qDebug() << "Setting:" << "mode" << settings.bot_setting_target() << "grid_trycount"<< settings.bot_setting_grid_trycount()  << "grid_ignoretime"<< settings.bot_setting_grid_ignoretime()
+    //    << "dxcc_trycount"<< settings.bot_setting_dxcc_trycount()  << "dxcc_ignoretime"<< settings.bot_setting_dxcc_ignoretime();
+    
+    if (_data.size() > 0){
+      QSO tt,t;
+      int priority = b_init;
+      dist = 0;
+      CALLED is_called;
+      QString selected;
+      foreach(QString key, _data.keys()) {
+        on_black=_blackdata.value(key,0);
+        is_called.rep=-35;
+        is_called.time=0;
+        is_called=_calldata.value(key,is_called);
+        tt=_data[key];
+
+        // remove unseen
+        if (tt.active_timestamp < curTime - 1200) {
+          _data.remove(key);
+          qDebug() << "Remove:" << tt.call << "priority:" << tt.priority << "rep:" << tt.s_rep << "status:" << tt.status
+            << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
+            << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
+            << "is_called.rep:" << is_called.rep << "is_called.time:" << is_called.time;
+          continue;
+        }
+
+        int calc_pri = tt.priority;
+        if (tt.status == RCALL || tt.status == RREPORT || tt.status == RRREPORT || tt.status == RRR73 || tt.status == RRR) {
+          calc_pri += 100;
+        }
+        if (tt.status == RCQ) {
+          calc_pri += 1;
+        }
+
+        if (!wantedCallList.isEmpty() && (wantedCallList.indexOf(key) >= 0)) {
+          calc_pri += 50;
+        }
+
+        // check call counter
+        if (calc_pri < 100) {
+          if (curTime - tt.active_timestamp > 120) {
+            // qDebug() << "Skip inactive:" << tt.call << "priority:" << tt.priority << "rep:" << tt.s_rep << "status:" << tt.status
+            //       << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
+            //       << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
+            //       << "is_called.rep:" << is_called.rep << "is_called.time:" << is_called.time;
+            continue;
+          }
+          if (tt.priority >= 14 && tt.priority <= 19) {
+            if (tt.call_count >= normalCountLimit) {
+              if (curTime - tt.call_timestamp > normalRestTime) {
+                qDebug() << "Time" << curTime << "call_count:" << tt.call_count << "call_time:" << tt.call_timestamp;
+                tt.call_timestamp = 0;
+                tt.call_count = 0;
+                _data.insert(key, tt);
+                qDebug() << "Reset normal:" << tt.call << "priority:" << tt.priority << "rep:" << tt.s_rep << "status:" << tt.status
+                  << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
+                  << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
+                  << "is_called.rep:" << is_called.rep << "is_called.time:" << is_called.time;
+              } else {
+                qDebug() << "Skip normal:" << tt.call << "priority:" << tt.priority << "rep:" << tt.s_rep << "status:" << tt.status
+                  << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
+                  << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
+                  << "is_called.rep:" << is_called.rep << "is_called.time:" << is_called.time;
+                continue;
+              }
+            }
+          } else if (tt.priority >= 20) {
+            if (tt.call_count >= prioCountLimit) {
+              if (curTime - tt.call_timestamp > prioRestTime) {
+                qDebug() << "Time" << curTime << "call_count:" << tt.call_count << "call_time:" << tt.call_timestamp;
+                tt.call_timestamp = 0;
+                tt.call_count = 0;
+                _data.insert(key, tt);
+                qDebug() << "Reset prio:" << tt.call << "priority:" << tt.priority << "rep:" << tt.s_rep << "status:" << tt.status
+                  << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
+                  << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
+                  << "is_called.rep:" << is_called.rep << "is_called.time:" << is_called.time;
+              } else {
+                qDebug() << "Skip prio:" << tt.call << "priority:" << tt.priority << "rep:" << tt.s_rep << "status:" << tt.status
+                  << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
+                  << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
+                  << "is_called.rep:" << is_called.rep << "is_called.time:" << is_called.time;
+                continue;
+              }
+            }
+          }
+        }
+
+        int pri_level = 15;
+        if (settings.bot_setting_target() == 1) {
+          pri_level = 20;
+        }
+        if (tt.tyyp == "JA" || tt.tyyp == "JP" || tt.tyyp == "NA" || tt.tyyp == "SA" || tt.tyyp == "EU" || tt.tyyp == "US" || tt.tyyp == "USA") {
+          continue;
+        }
+        if (on_black == 0 && tt.status != FIN && tt.status != S73 && tt.seen_time >= max_r_time-120 && calc_pri >= pri_level) {
+          qDebug() << "Check:" << tt.call << "priority:" << tt.priority << "rep:" << "cal_pri:" << calc_pri << tt.s_rep << "status:" << tt.status
+            << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
+            << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
+            << "is_called.rep:" << is_called.rep << "is_called.time:" << is_called.time;
+          if (calc_pri > priority) {
+            t = tt;
+            priority = calc_pri;
+            prio = calc_pri;
+            if (tt.status == NONE) ret = RCQ;
+            else ret = tt.status;
+            callsign = tt.call;
+            count = tt.count;
+            dist = tt.distance;
+            grid = tt.grid;
+            mode = tt.mode;
+            rep = tt.s_rep;
+            if (tt.rx >0) rx = tt.rx;
+            if (tt.tx >0) tx = tt.tx;
+            time = tt.time;
+            seen_time = tt.seen_time;
+            selected = key;
+            qDebug() << "Select:" << callsign << "priority:" << priority << "grid:" << tt.grid << "rep:" << rep;
+          }
+        }
+      }
+
+      // update counter of selected
+      if (ret != NONE) {
+        tt = _data[selected];
+        tt.call_count++;
+        tt.call_timestamp = curTime;
+        _data.insert(selected, tt);
+      }
+      return ret;
+    }
+  }
+  return NONE;
+}
+
 QsoHistory::Status QsoHistory::log_data(QString const& callsign, unsigned &time, QString &rrep, QString &srep)
 {
     if (_working)
@@ -422,7 +584,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
           t.stx_c = NONE;
           t.stx_p = NONE;
           t.count = 0;
-          t.priority = 0;
+          t.priority = priority;
           t.tx = 0;
           t.rx = 0;
           t.b_time = 0;
@@ -433,7 +595,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
           t.mpx = "";
           t.grid = "";
           t.r_rep = "";
-          t.s_rep = "";
+          t.s_rep = rep;
           t.distance = 0;
           t.mode = "";
           t = _data.value(Radio::base_callsign (callsign),t);
@@ -567,7 +729,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                       if (t.continent.isEmpty ()) t.continent = continent.trimmed();
                       if (t.mpx.isEmpty ()) t.mpx = mpx;
                       t.r_rep = param;
-                      if (old_status < SCQ || t.stx_c == NONE) t.b_time = time;
+                      if (old_status < SCQ) t.b_time = time;
                       t.rx = freq;
       //                max_r_time = time;
                       as_active = true;
@@ -583,7 +745,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                     old_status = t.status;
                     t.status = status;
                     t.tx = freq;
-                    if (old_status < SCQ || tyyp == "S") t.b_time = time;
+                    if (old_status < SCQ) t.b_time = time;
                   }
                   break;
                 }
@@ -598,7 +760,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                       if (t.continent.isEmpty ()) t.continent = continent.trimmed();
                       if (t.mpx.isEmpty ()) t.mpx = mpx;
                       t.r_rep = param;
-                      if (old_status < SCQ || t.stx_c == NONE) t.b_time = time;
+                      if (old_status < SCQ) t.b_time = time;
                       t.rx = freq;
       //                max_r_time = time;
                       as_active = true;
@@ -652,7 +814,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                         {
                           old_status = t.status;
                           t.status = FIN;
-                          t.priority = 0;
+                          // t.priority = 0;
                         }
                       else 
                         {
@@ -672,7 +834,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                     {
                       old_status = t.status;
                       t.status = FIN;
-                      t.priority = 0;
+                      // t.priority = 0;
                     }
                   else
                     {
@@ -692,7 +854,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                         {
                           old_status = t.status;
                           t.status = FIN;
-                          t.priority = 0;
+                          // t.priority = 0;
                         }
                       else
                         {
@@ -712,7 +874,7 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                     {
                       old_status = t.status;
                       t.status = FIN;
-                      t.priority = 0;
+                      // t.priority = 0;
                     }
                   else
                     {
@@ -729,6 +891,18 @@ void QsoHistory::message(QString const& callsign, Status status, int priority, Q
                   break;
                 }
             }
+            if (status % 2 == 0) {
+              t.seen_time = time;
+              t.active_timestamp = get_timestamp();
+            }
+            else {
+              t.call_timestamp = get_timestamp();
+            }
+            if (!_data.contains(Radio::base_callsign (callsign))) {
+              t.call_timestamp = 0;
+              t.call_count = 0;
+            }
+            // qDebug() << "Insert call:" << Radio::base_callsign (callsign) << "priority:" << t.priority << "status" << status << "call_time" << t.call_timestamp << "call_count" << t.call_count << "qso_status:" << t.status << "grid:" << t.grid << "rep:" << t.s_rep << "seen_time:" << t.seen_time;
             _data.insert(Radio::base_callsign (callsign),t);
           }
           
