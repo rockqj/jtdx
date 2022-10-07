@@ -447,7 +447,8 @@ QsoHistory::Status QsoHistory::autosniffer(QString &callsign, QString &grid, QSt
         if (tt.tyyp == "JA" || tt.tyyp == "JP" || tt.tyyp == "NA" || tt.tyyp == "SA" || tt.tyyp == "EU" || tt.tyyp == "US" || tt.tyyp == "USA") {
           continue;
         }
-        if (on_black == 0 && tt.status != FIN && tt.status != S73 && tt.seen_time >= max_r_time-120 && calc_pri >= pri_level && tt.call[0] != 'B') {
+        if (on_black == 0 && tt.status != FIN && tt.status != S73 && tt.seen_time >= max_r_time-120 && calc_pri >= pri_level && 
+          (calc_pri > 100 || tt.call[0] != 'B')) {
           qDebug() << "Check:" << tt.call << "priority:" << tt.priority << "rep:" << "cal_pri:" << calc_pri << tt.s_rep << "status:" << tt.status
             << "active_time" << tt.active_timestamp << "call_time:" << tt.call_timestamp << "call_count:" << tt.call_count
             << "seen_time:" << tt.seen_time << "cont:" << tt.continent << "tyyp:" << tt.tyyp
