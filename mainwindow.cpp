@@ -1700,7 +1700,7 @@ void MainWindow::setAutoSeqButtonStyle(bool checked) {
 // set text on TX even/odd minute button
 void MainWindow::setMinButton()
 {
-  qDebug() << "setMinButton";
+  // qDebug() << "setMinButton";
   if(!m_mode.startsWith ("WSPR")) {
 	if(m_txFirst) {
 	  if(m_mode.startsWith("FT")) {

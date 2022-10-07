@@ -923,7 +923,7 @@ int DisplayText::displayDecodedText(DecodedText* decodedText, QString myCall, QS
         txtColor = Radio::convert_dark("#000000",useDarkStyle_);
     }
     if (show_line) {
-        if (!checkCall.isEmpty () && (std_type == 1 || std_type == 2 || std_type == 4 || (std_type == 3 && !param.isEmpty()))) {
+        if (!checkCall.isEmpty ()) {
             qsoHistory.message(checkCall,status,priority,param,tyyp,countryName.left(2),mpx,c_time,decodedText->report(),decodedText->frequencyOffset(),checkMode);
         } 
         if (std_type == 2) {

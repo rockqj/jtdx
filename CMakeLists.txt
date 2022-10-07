@@ -1,9 +1,13 @@
 cmake_minimum_required (VERSION 3.7.2 FATAL_ERROR)
 
+# rig control log
+set (JTDX_DEBUG_TO_FILE OFF)
+
+# qdebug
 set (WSJT_QDEBUG_TO_FILE ON)
-set (JTDX_DEBUG_TO_FILE ON)
 set (WSJT_QDEBUG_IN_RELEASE ON)
 
+# others
 set (WSJT_TRACE_CAT OFF)
 set (WSJT_TRACE_CAT_POLLS OFF)
 set (WSJT_HAMLIB_TRACE OFF)
