@@ -3550,7 +3550,9 @@ void MainWindow::process_Auto()
     else if (m_callHigherNewCall) time |= 256;
     if (m_rprtPriority) time |= 16;
     if (m_maxDistance) time |= 32;
-    if (m_hisCall.isEmpty() && !ui->enableTxButton->isChecked() && ui->botButton->isChecked()) {
+    if (m_hisCall.isEmpty() && !ui->enableTxButton->isChecked() && ui->botButton->isChecked()
+      && m_config.frequencies()->find(m_freqNominal) != m_config.frequencies()->end()
+      && m_config.frequencies()->find(m_freqNominal)->default_) {
       m_status = m_qsoHistory.autosniffer(hisCall,grid,rpt,rx,tx,time,seen_time,count,prio,mode,m_config,m_wantedCallList);
       if (!hisCall.isEmpty()) snifferTx = true;
       qDebug() << "Sniffer end:" << hisCall << "priority:" << prio << "grid:" << grid << "rpt:" << rpt
@@ -7960,7 +7962,7 @@ void MainWindow::on_the_minute ()
        else if(m_modeTx=="FT4") { if(deltasec > 16) update=false; } //to be checked
        else { if(deltasec > 134) update=false; }
     }
-    if (update && (m_idleMinutes < m_config.watchdog ())) { ++m_idleMinutes; update_watchdog_label (); }
+    if (update && (m_idleMinutes < m_houndMode ? m_config.watchdog()*3 : m_config.watchdog())) { ++m_idleMinutes; update_watchdog_label (); }
   }
   else { txwatchdog (false); }
   //3...4 minutes to stop AP decoding
@@ -8079,7 +8081,7 @@ void MainWindow::update_watchdog_label ()
 {
   if (m_config.watchdog () && !m_mode.startsWith ("WSPR"))
     {
-      txwatchdog_label->setText (QString {tr("WD %1m")}.arg (m_config.watchdog () - m_idleMinutes));
+      txwatchdog_label->setText (QString {tr("WD %1m")}.arg (m_houndMode ? m_config.watchdog()*3 : m_config.watchdog() - m_idleMinutes));
       txwatchdog_label->setVisible (true);
     }
   else

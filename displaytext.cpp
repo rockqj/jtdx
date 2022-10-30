@@ -785,6 +785,7 @@ int DisplayText::displayDecodedText(DecodedText* decodedText, QString myCall, QS
                         new_marker = true;
                     }
                 } 
+                if (std_type == 3 && forceBold) forceBold = false;
                 if (displayWorkedDontShow_ && std_type != 2 && ((!forceBold && ((displayPotential_ && std_type == 3) || std_type != 3)) || (!new_marker && otherMessagesMarker_ && std_type == 3))) {
                     show_line = false;
                 }
