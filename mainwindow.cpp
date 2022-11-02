@@ -4599,7 +4599,7 @@ void MainWindow::guiUpdate()
 //Once per second:
   if(nsec != m_sec0) {
     if (m_config.watchdog() && !m_transmitting && !m_mode.startsWith ("WSPR")
-        && m_idleMinutes >= m_config.watchdog ()) {
+        && m_idleMinutes >= (m_houndMode ? m_config.watchdog()*5 : m_config.watchdog())) {
       txwatchdog (true);       // switch off Enable Tx button
     }
     if(m_tune && m_config.tunetimer() && !m_tuneup) { //shall not count at WSPR band hopping
@@ -7962,7 +7962,7 @@ void MainWindow::on_the_minute ()
        else if(m_modeTx=="FT4") { if(deltasec > 16) update=false; } //to be checked
        else { if(deltasec > 134) update=false; }
     }
-    if (update && (m_idleMinutes < m_houndMode ? m_config.watchdog()*3 : m_config.watchdog())) { ++m_idleMinutes; update_watchdog_label (); }
+    if (update && (m_idleMinutes < (m_houndMode ? m_config.watchdog()*5 : m_config.watchdog()))) { ++m_idleMinutes; update_watchdog_label (); }
   }
   else { txwatchdog (false); }
   //3...4 minutes to stop AP decoding
@@ -8081,7 +8081,7 @@ void MainWindow::update_watchdog_label ()
 {
   if (m_config.watchdog () && !m_mode.startsWith ("WSPR"))
     {
-      txwatchdog_label->setText (QString {tr("WD %1m")}.arg (m_houndMode ? m_config.watchdog()*3 : m_config.watchdog() - m_idleMinutes));
+      txwatchdog_label->setText (QString {tr("WD %1m")}.arg ((m_houndMode ? m_config.watchdog()*5 : m_config.watchdog()) - m_idleMinutes));
       txwatchdog_label->setVisible (true);
     }
   else
